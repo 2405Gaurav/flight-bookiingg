@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useMemo, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { AIRPORTS } from '@/lib/airports'
 import { useFlightStore } from '@/stores/useFlightStore'
@@ -12,26 +12,22 @@ export default function FlightSearchForm() {
   const searchParams = useSearchParams()
   const setSearchQuery = useFlightStore((s) => s.setSearchQuery)
 
-  const [origin, setOrigin] = useState('')
-  const [destination, setDestination] = useState('')
-  const [date, setDate] = useState('')
-  const [passengers, setPassengers] = useState(1)
+  const initial = useMemo(() => {
+    const o = searchParams.get('origin') ?? ''
+    const d = searchParams.get('destination') ?? ''
+    const dt = searchParams.get('date') ?? ''
+    const p = Number(searchParams.get('passengers') ?? '1') || 1
+    return { origin: o, destination: d, date: dt, passengers: Math.min(9, Math.max(1, p)) }
+  }, [searchParams])
+
+  const [origin, setOrigin] = useState(initial.origin)
+  const [destination, setDestination] = useState(initial.destination)
+  const [date, setDate] = useState(initial.date)
+  const [passengers, setPassengers] = useState(initial.passengers)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   // Minimum date = today
   const today = new Date().toISOString().split('T')[0]
-
-  // Pre-fill from URL searchParams on mount
-  useEffect(() => {
-    const o = searchParams.get('origin')
-    const d = searchParams.get('destination')
-    const dt = searchParams.get('date')
-    const p = searchParams.get('passengers')
-    if (o) setOrigin(o)
-    if (d) setDestination(d)
-    if (dt) setDate(dt)
-    if (p) setPassengers(Number(p) || 1)
-  }, [searchParams])
 
   function validate(): boolean {
     const errs: Record<string, string> = {}

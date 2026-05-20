@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useFlightStore } from '@/stores/useFlightStore'
 import { getCity, formatTime, formatDate, formatDuration, formatPrice } from '@/lib/airports'
@@ -17,12 +17,35 @@ const CLASS_COLORS: Record<string, string> = {
   economy: 'border-sky-400 bg-sky-400/10 text-sky-300',
 }
 
+type ConfettiSpec = {
+  delay: number
+  left: number
+  color: string
+  size: number
+  rotation: number
+  duration: number
+}
+
+function hashStringToSeed(input: string) {
+  let h = 2166136261
+  for (let i = 0; i < input.length; i++) {
+    h ^= input.charCodeAt(i)
+    h = Math.imul(h, 16777619)
+  }
+  return h >>> 0
+}
+
+function prng01(seed: number, index: number) {
+  // Deterministic pseudo-random in [0, 1)
+  let t = seed + index * 0x6d2b79f5
+  t = Math.imul(t ^ (t >>> 15), 1 | t)
+  t ^= t + Math.imul(t ^ (t >>> 7), 61 | t)
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+}
+
 // Simple confetti particle
-function ConfettiParticle({ delay, left }: { delay: number; left: number }) {
-  const colors = ['#0ea5e9', '#6366f1', '#10b981', '#f59e0b', '#ef4444', '#c084fc']
-  const color = colors[Math.floor(Math.random() * colors.length)]
-  const size = 6 + Math.random() * 6
-  const rotation = Math.random() * 360
+function ConfettiParticle({ spec }: { spec: ConfettiSpec }) {
+  const { delay, left, color, size, rotation, duration } = spec
 
   return (
     <div
@@ -35,7 +58,7 @@ function ConfettiParticle({ delay, left }: { delay: number; left: number }) {
         backgroundColor: color,
         borderRadius: '2px',
         transform: `rotate(${rotation}deg)`,
-        animation: `confettiFall ${2 + Math.random() * 2}s ease-in forwards`,
+        animation: `confettiFall ${duration}s ease-in forwards`,
         animationDelay: `${delay}s`,
         opacity: 0,
       }}
@@ -53,20 +76,38 @@ export default function ConfirmationPage() {
     resetStore,
   } = useFlightStore()
 
-  const [mounted, setMounted] = useState(false)
+  const confetti = useMemo<ConfettiSpec[]>(() => {
+    if (!bookingResult) return []
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+    const colors = ['#0ea5e9', '#6366f1', '#10b981', '#f59e0b', '#ef4444', '#c084fc'] as const
+    const seed = hashStringToSeed(bookingResult.bookingId + bookingResult.pnrCode)
+
+    return Array.from({ length: 40 }).map((_, i) => {
+      const r1 = prng01(seed, i * 5 + 1)
+      const r2 = prng01(seed, i * 5 + 2)
+      const r3 = prng01(seed, i * 5 + 3)
+      const r4 = prng01(seed, i * 5 + 4)
+      const r5 = prng01(seed, i * 5 + 5)
+
+      return {
+        delay: Math.round(r1 * 150) / 100, // 0.00 - 1.50
+        left: Math.round(r2 * 10000) / 100, // 0 - 100
+        color: colors[Math.floor(r3 * colors.length)] ?? colors[0],
+        size: 6 + Math.round(r4 * 6 * 10) / 10, // 6 - 12
+        rotation: Math.round(r5 * 3600) / 10, // 0 - 360
+        duration: 2 + Math.round(prng01(seed, i * 7 + 6) * 2 * 10) / 10, // 2 - 4
+      }
+    })
+  }, [bookingResult])
 
   // Redirect if no booking result
   useEffect(() => {
-    if (mounted && !bookingResult) {
-      router.push('/flights')
+    if (!bookingResult) {
+      router.replace('/flights')
     }
-  }, [mounted, bookingResult, router])
+  }, [bookingResult, router])
 
-  if (!mounted || !bookingResult || !selectedFlight || !selectedSeat) {
+  if (!bookingResult || !selectedFlight || !selectedSeat) {
     return (
       <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
@@ -86,12 +127,8 @@ export default function ConfirmationPage() {
     <div className="min-h-[calc(100vh-4rem)] hero-gradient relative overflow-hidden">
       {/* Confetti */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {Array.from({ length: 40 }).map((_, i) => (
-          <ConfettiParticle
-            key={i}
-            delay={Math.random() * 1.5}
-            left={Math.random() * 100}
-          />
+        {confetti.map((spec, i) => (
+          <ConfettiParticle key={i} spec={spec} />
         ))}
       </div>
 

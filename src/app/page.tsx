@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
-import FlightSearchForm from '@/components/flights/FlightSearchForm'
 
 export default async function HomePage() {
   const supabase = await createSupabaseServerClient()
@@ -35,9 +34,27 @@ export default async function HomePage() {
         </div>
 
         {user ? (
-          /* Logged-in hero: show search form */
-          <div className="relative z-10 w-full max-w-4xl glass-card p-6 sm:p-8 animate-slide-up stagger-2">
-            <FlightSearchForm />
+          /* Logged-in hero: show CTA */
+          <div className="relative z-10 flex flex-col sm:flex-row items-center gap-4 animate-slide-up stagger-2">
+            <Link
+              href="/flights"
+              className="btn-primary text-base py-3.5 px-10 flex items-center gap-2"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
+                />
+              </svg>
+              Book a Flight
+            </Link>
           </div>
         ) : (
           /* Logged-out hero: show CTA buttons */

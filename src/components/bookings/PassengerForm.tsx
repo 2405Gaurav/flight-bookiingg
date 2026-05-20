@@ -46,14 +46,6 @@ export default function PassengerForm({ flight, seats, preselectedClass }: Props
   const [loading, setLoading] = useState(false)
   const [submitError, setSubmitError] = useState('')
 
-  // Restore form from store on mount
-  useEffect(() => {
-    if (passengerForm.fullName) setFullName(passengerForm.fullName)
-    if (passengerForm.passportNo) setPassportNo(passengerForm.passportNo)
-    if (passengerForm.nationality) setNationality(passengerForm.nationality)
-    if (passengerForm.dob) setDob(passengerForm.dob)
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
   // Save to store on change
   useEffect(() => {
     setPassengerForm({ fullName, passportNo, nationality, dob })

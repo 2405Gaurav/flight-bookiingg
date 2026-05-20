@@ -8,7 +8,6 @@ import { formatPrice } from '@/lib/airports'
 type Props = {
   flight: FlightRow
   seats: SeatRow[]
-  userId: string
 }
 
 const CLASS_ORDER = ['first', 'business', 'economy'] as const
@@ -23,7 +22,7 @@ const CLASS_LABELS: Record<string, string> = {
   economy: 'Economy',
 }
 
-export default function BookingForm({ flight, seats, userId }: Props) {
+export default function BookingForm({ flight, seats }: Props) {
   const router = useRouter()
   const [selectedSeat, setSelectedSeat] = useState<SeatRow | null>(null)
   const [fullName, setFullName] = useState('')

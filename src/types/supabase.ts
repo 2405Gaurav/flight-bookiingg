@@ -33,6 +33,7 @@ export interface Database {
         }
         Insert: Omit<Database['public']['Tables']['flights']['Row'], 'id' | 'created_at'>
         Update: Partial<Database['public']['Tables']['flights']['Insert']>
+        Relationships: []
       }
       seats: {
         Row: {
@@ -46,6 +47,7 @@ export interface Database {
         }
         Insert: Omit<Database['public']['Tables']['seats']['Row'], 'id' | 'created_at'>
         Update: Partial<Database['public']['Tables']['seats']['Insert']>
+        Relationships: []
       }
       bookings: {
         Row: {
@@ -61,6 +63,7 @@ export interface Database {
         }
         Insert: Omit<Database['public']['Tables']['bookings']['Row'], 'id' | 'booked_at' | 'created_at'>
         Update: Partial<Database['public']['Tables']['bookings']['Insert']>
+        Relationships: []
       }
       passengers: {
         Row: {
@@ -74,6 +77,7 @@ export interface Database {
         }
         Insert: Omit<Database['public']['Tables']['passengers']['Row'], 'id' | 'created_at'>
         Update: Partial<Database['public']['Tables']['passengers']['Insert']>
+        Relationships: []
       }
       reschedules: {
         Row: {
@@ -86,6 +90,7 @@ export interface Database {
         }
         Insert: Omit<Database['public']['Tables']['reschedules']['Row'], 'id' | 'requested_at'>
         Update: Partial<Database['public']['Tables']['reschedules']['Insert']>
+        Relationships: []
       }
     }
     Functions: {
@@ -116,6 +121,9 @@ export interface Database {
         Returns: { fee_charged: number }[]
       }
     }
+    Views: Record<string, never>
+    Enums: Record<string, never>
+    CompositeTypes: Record<string, never>
   }
 }
 
