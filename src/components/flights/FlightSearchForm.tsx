@@ -1,25 +1,70 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { AIRPORTS } from '@/lib/airports'
+import { useFlightStore } from '@/stores/useFlightStore'
 
 const airportCodes = Object.keys(AIRPORTS)
 
 export default function FlightSearchForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const setSearchQuery = useFlightStore((s) => s.setSearchQuery)
+
   const [origin, setOrigin] = useState('')
   const [destination, setDestination] = useState('')
   const [date, setDate] = useState('')
   const [passengers, setPassengers] = useState(1)
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   // Minimum date = today
   const today = new Date().toISOString().split('T')[0]
 
+  // Pre-fill from URL searchParams on mount
+  useEffect(() => {
+    const o = searchParams.get('origin')
+    const d = searchParams.get('destination')
+    const dt = searchParams.get('date')
+    const p = searchParams.get('passengers')
+    if (o) setOrigin(o)
+    if (d) setDestination(d)
+    if (dt) setDate(dt)
+    if (p) setPassengers(Number(p) || 1)
+  }, [searchParams])
+
+  function validate(): boolean {
+    const errs: Record<string, string> = {}
+
+    if (!origin) errs.origin = 'Please select an origin.'
+    if (!destination) errs.destination = 'Please select a destination.'
+    if (origin && destination && origin === destination) {
+      errs.destination = 'Destination must be different from origin.'
+    }
+    if (!date) {
+      errs.date = 'Please select a date.'
+    } else if (date < today) {
+      errs.date = 'Date must be today or later.'
+    }
+
+    setErrors(errs)
+    return Object.keys(errs).length === 0
+  }
+
   function handleSearch(e: React.FormEvent) {
     e.preventDefault()
-    if (!origin || !destination || !date) return
-    const params = new URLSearchParams({ origin, destination, date, passengers: String(passengers) })
+    if (!validate()) return
+
+    // Update zustand store
+    setSearchQuery({ origin, destination, date, passengerCount: passengers })
+
+    // Navigate with search params
+    const params = new URLSearchParams({
+      origin,
+      destination,
+      date,
+      passengers: String(passengers),
+    })
     router.push(`/flights?${params.toString()}`)
   }
 
@@ -34,8 +79,11 @@ export default function FlightSearchForm() {
           <select
             id="origin-select"
             value={origin}
-            onChange={(e) => setOrigin(e.target.value)}
-            className="form-select"
+            onChange={(e) => {
+              setOrigin(e.target.value)
+              if (errors.origin) setErrors((prev) => ({ ...prev, origin: '' }))
+            }}
+            className={`form-select ${errors.origin ? 'border-error' : ''}`}
             required
           >
             <option value="">Select origin</option>
@@ -47,6 +95,9 @@ export default function FlightSearchForm() {
                 </option>
               ))}
           </select>
+          {errors.origin && (
+            <p className="text-error text-xs mt-1">{errors.origin}</p>
+          )}
         </div>
 
         {/* Destination */}
@@ -57,8 +108,11 @@ export default function FlightSearchForm() {
           <select
             id="destination-select"
             value={destination}
-            onChange={(e) => setDestination(e.target.value)}
-            className="form-select"
+            onChange={(e) => {
+              setDestination(e.target.value)
+              if (errors.destination) setErrors((prev) => ({ ...prev, destination: '' }))
+            }}
+            className={`form-select ${errors.destination ? 'border-error' : ''}`}
             required
           >
             <option value="">Select destination</option>
@@ -70,6 +124,9 @@ export default function FlightSearchForm() {
                 </option>
               ))}
           </select>
+          {errors.destination && (
+            <p className="text-error text-xs mt-1">{errors.destination}</p>
+          )}
         </div>
 
         {/* Date */}
@@ -82,10 +139,16 @@ export default function FlightSearchForm() {
             type="date"
             value={date}
             min={today}
-            onChange={(e) => setDate(e.target.value)}
-            className="form-input"
+            onChange={(e) => {
+              setDate(e.target.value)
+              if (errors.date) setErrors((prev) => ({ ...prev, date: '' }))
+            }}
+            className={`form-input ${errors.date ? 'border-error' : ''}`}
             required
           />
+          {errors.date && (
+            <p className="text-error text-xs mt-1">{errors.date}</p>
+          )}
         </div>
 
         {/* Passengers */}
@@ -99,7 +162,7 @@ export default function FlightSearchForm() {
             onChange={(e) => setPassengers(Number(e.target.value))}
             className="form-select"
           >
-            {[1, 2, 3, 4, 5, 6].map((n) => (
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
               <option key={n} value={n}>
                 {n} {n === 1 ? 'Passenger' : 'Passengers'}
               </option>
