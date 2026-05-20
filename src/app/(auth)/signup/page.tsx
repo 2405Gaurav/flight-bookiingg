@@ -28,46 +28,49 @@ export default function SignupPage() {
 
   return (
     <>
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Create account</h1>
+      <h1 className="text-2xl font-bold text-foreground mb-6">Create account</h1>
 
       {error && (
-        <p className="mb-4 text-sm text-red-600 bg-red-50 p-3 rounded-lg">{error}</p>
+        <p className="mb-4 text-sm text-error bg-error/10 border border-error/20 p-3 rounded-lg">{error}</p>
       )}
 
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <label className="block text-xs font-medium text-muted mb-1.5 uppercase tracking-wider">Email</label>
           <input
+            id="signup-email"
             type="email"
             value={email}
             onChange={e => setEmail(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="form-input"
             placeholder="you@example.com"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+          <label className="block text-xs font-medium text-muted mb-1.5 uppercase tracking-wider">Password</label>
           <input
+            id="signup-password"
             type="password"
             value={password}
             onChange={e => setPassword(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleSignup()}
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="form-input"
             placeholder="Min. 6 characters"
           />
         </div>
         <button
+          id="signup-submit-btn"
           onClick={handleSignup}
           disabled={loading}
-          className="w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition"
+          className="btn-primary w-full py-3"
         >
           {loading ? 'Creating account…' : 'Create account'}
         </button>
       </div>
 
-      <p className="mt-6 text-sm text-center text-gray-500">
+      <p className="mt-6 text-sm text-center text-muted">
         Already have an account?{' '}
-        <Link href="/login" className="text-blue-600 hover:underline">Sign in</Link>
+        <Link href="/login" className="text-primary hover:underline">Sign in</Link>
       </p>
     </>
   )
