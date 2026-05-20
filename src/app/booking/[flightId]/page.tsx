@@ -1,8 +1,19 @@
 import { redirect } from 'next/navigation'
 import { getFlightById } from '@/app/flights/actions'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
+import { getSeatsForFlight, getUserBookedSeat } from '@/app/booking/[flightId]/actions'
 import { getCity, formatTime, formatDate, formatDuration, formatPrice } from '@/lib/airports'
 import PassengerForm from '@/components/bookings/PassengerForm'
 import type { SeatClass } from '@/types/supabase'
+
+const SEAT_CLASSES: SeatClass[] = ['economy', 'business', 'first']
+
+function parseSeatClass(value: string | undefined): SeatClass {
+  if (value && SEAT_CLASSES.includes(value as SeatClass)) {
+    return value as SeatClass
+  }
+  return 'economy'
+}
 
 export default async function BookingPage({
   params,
@@ -13,9 +24,7 @@ export default async function BookingPage({
 }) {
   const { flightId } = await params
   const sp = await searchParams
-  const preselectedClass = (
-    typeof sp.class === 'string' ? sp.class : 'economy'
-  ) as SeatClass
+  const selectedClass = parseSeatClass(typeof sp.class === 'string' ? sp.class : undefined)
 
   const { data: flightData, error } = await getFlightById(flightId)
 
@@ -24,6 +33,27 @@ export default async function BookingPage({
   }
 
   const { seats, ...flight } = flightData
+  void seats
+
+  const supabase = await createSupabaseServerClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  const [{ data: seatRows, error: seatsError }, bookedSeatResult] = await Promise.all([
+    getSeatsForFlight(flightId),
+    user
+      ? getUserBookedSeat(flightId, user.id)
+      : Promise.resolve({ data: null as string | null, error: null as string | null }),
+  ])
+
+  if (seatsError || !seatRows) {
+    redirect('/flights')
+  }
+
+  const userBookedSeatId =
+    bookedSeatResult.error || !bookedSeatResult.data ? undefined : bookedSeatResult.data
+
   const duration = formatDuration(flight.departs_at, flight.arrives_at)
 
   return (
@@ -83,11 +113,11 @@ export default async function BookingPage({
           </div>
         </div>
 
-        {/* Passenger Form + Seat Selection */}
         <PassengerForm
           flight={flight}
-          seats={seats}
-          preselectedClass={preselectedClass}
+          initialSeats={seatRows}
+          userBookedSeatId={userBookedSeatId}
+          selectedClass={selectedClass}
         />
       </div>
     </div>

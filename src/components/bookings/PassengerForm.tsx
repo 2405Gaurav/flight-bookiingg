@@ -10,8 +10,9 @@ import SeatModal from '@/components/seats/SeatModal'
 
 type Props = {
   flight: FlightRow
-  seats: SeatRow[]
-  preselectedClass: SeatClass
+  initialSeats: SeatRow[]
+  userBookedSeatId?: string
+  selectedClass: SeatClass
 }
 
 const CLASS_LABELS: Record<string, string> = {
@@ -26,7 +27,12 @@ const CLASS_COLORS: Record<string, string> = {
   economy: 'border-sky-400 bg-sky-400/10 text-sky-300',
 }
 
-export default function PassengerForm({ flight, seats, preselectedClass }: Props) {
+export default function PassengerForm({
+  flight,
+  initialSeats,
+  userBookedSeatId,
+  selectedClass,
+}: Props) {
   const router = useRouter()
   const {
     passengerForm,
@@ -74,7 +80,7 @@ export default function PassengerForm({ flight, seats, preselectedClass }: Props
     setShowSeatModal(true)
   }
 
-  function handleSeatSelect(seat: SeatRow) {
+  function handleSeatConfirmed(seat: SeatRow) {
     setSelectedSeat(seat)
     setShowSeatModal(false)
   }
@@ -307,15 +313,16 @@ export default function PassengerForm({ flight, seats, preselectedClass }: Props
         )}
       </div>
 
-      {/* Seat Modal */}
-      {showSeatModal && (
-        <SeatModal
-          seats={seats}
-          selectedClass={preselectedClass}
-          onSelect={handleSeatSelect}
-          onClose={() => setShowSeatModal(false)}
-        />
-      )}
+      <SeatModal
+        isOpen={showSeatModal}
+        onClose={() => setShowSeatModal(false)}
+        flight={flight}
+        flightId={flight.id}
+        initialSeats={initialSeats}
+        userBookedSeatId={userBookedSeatId}
+        selectedClass={selectedClass}
+        onSeatConfirmed={handleSeatConfirmed}
+      />
     </>
   )
 }
