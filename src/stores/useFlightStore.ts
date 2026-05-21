@@ -1,6 +1,8 @@
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import type { FlightRow, SeatRow } from '@/types/supabase'
+// The Persist middleware enables you to store your Zustand state in a storage 
+//(e.g., localStorage, AsyncStorage, IndexedDB, etc.), thus persisting its data.
 
 export interface SearchQuery {
   origin: string

@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
@@ -46,3 +47,24 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
 }
+
+
+// Browser Request
+// (includes cookies automatically)
+//         ↓
+// ┌─────────────────────────────────┐
+// │        Next.js Server           │
+// │                                 │
+// │  proxy.ts runs FIRST            │
+// │  → reads cookie                 │
+// │  → calls supabase.auth.getUser()│
+// │  → if no valid JWT → redirect   │
+// │                                 │
+// │  Then your page runs            │
+// │  → createSupabaseServerClient() │
+// │  → reads same cookie            │
+// │  → getUser() returns the user   │
+// └─────────────────────────────────┘
+//         ↓
+//   Supabase Database
+//   (PostgreSQL in Supabase cloud)

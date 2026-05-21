@@ -2,12 +2,20 @@
 
 import { useState } from 'react'
 import { createSupabaseBrowserClient } from '@/lib/supabase/client'
+//as we are uisng the supabse auth 
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+// useRouter — programmatic navigation (redirect after login).
+// Link — client-side navigation without full page reload.
+import { useUserStore } from '@/stores/useUserStore'
 
 export default function LoginPage() {
+
+  const setSession = useUserStore((s) => s.setSession)
+
   const router = useRouter()
   const supabase = createSupabaseBrowserClient()
+  // supabase — your connection to Supabase, gives access to .auth, .from(), .channel() etc.
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -16,13 +24,23 @@ export default function LoginPage() {
   async function handleLogin() {
     setLoading(true)
     setError('')
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { error,data} = await supabase.auth.signInWithPassword({ email, password })
+    // → if valid: returns { data: { session, user }, error: null }
+    // → if invalid: returns { data: null, error: { message: "..." } }
+  //   Supabase also automatically:
+  // - Sets a cookie with the JWT session token
+  // - The middleware reads this cookie on every request
+  // - That's how Server Components know who's logged in
     if (error) {
       setError(error.message)
       setLoading(false)
     } else {
+      setSession(data.session)
       router.push('/')
       router.refresh()
+      // router.refresh() is critical
+      //  without it, the landing page's Server Component still thinks the user is logged out because it cached the old response
+      // . refresh() forces it to re-check the session cookie.
     }
   }
 

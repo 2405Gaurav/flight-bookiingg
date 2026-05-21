@@ -1,7 +1,6 @@
 // types/supabase.ts
-// Hand-written DB types that mirror your Supabase schema.
+// Hand-written DB types that mirror thee Supabase schema.
 // You can ALSO auto-generate this file with:
-//   npx supabase gen types typescript --project-id <your-ref> > types/supabase.ts
 
 export type Json =
   | string

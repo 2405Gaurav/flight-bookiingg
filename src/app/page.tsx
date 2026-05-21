@@ -1,3 +1,5 @@
+// This runs on the Next.js SERVER, not the browser
+
 import Link from 'next/link'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
@@ -6,6 +8,7 @@ export default async function HomePage() {
   const {
     data: { user },
   } = await supabase.auth.getUser()
+ //checks if the users is logged in and after the login pages redirection to here we also do router.refreseh to update the cserver component
 
   return (
     <div className="hero-gradient min-h-[calc(100vh-4rem)] flex flex-col">
