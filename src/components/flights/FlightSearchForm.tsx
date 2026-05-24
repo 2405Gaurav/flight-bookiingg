@@ -26,12 +26,10 @@ export default function FlightSearchForm() {
   const [passengers, setPassengers] = useState(initial.passengers)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  // Minimum date = today
   const today = new Date().toISOString().split('T')[0]
 
   function validate(): boolean {
     const errs: Record<string, string> = {}
-
     if (!origin) errs.origin = 'Please select an origin.'
     if (!destination) errs.destination = 'Please select a destination.'
     if (origin && destination && origin === destination) {
@@ -42,7 +40,6 @@ export default function FlightSearchForm() {
     } else if (date < today) {
       errs.date = 'Date must be today or later.'
     }
-
     setErrors(errs)
     return Object.keys(errs).length === 0
   }
@@ -50,17 +47,8 @@ export default function FlightSearchForm() {
   function handleSearch(e: React.FormEvent) {
     e.preventDefault()
     if (!validate()) return
-
-    // Update zustand store
     setSearchQuery({ origin, destination, date, passengerCount: passengers })
-
-    // Navigate with search params
-    const params = new URLSearchParams({
-      origin,
-      destination,
-      date,
-      passengers: String(passengers),
-    })
+    const params = new URLSearchParams({ origin, destination, date, passengers: String(passengers) })
     router.push(`/flights?${params.toString()}`)
   }
 
@@ -69,7 +57,7 @@ export default function FlightSearchForm() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {/* Origin */}
         <div>
-          <label className="block text-xs font-medium text-muted mb-1.5 uppercase tracking-wider">
+          <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wider" style={{ color: 'var(--muted)' }}>
             From
           </label>
           <select
@@ -92,13 +80,13 @@ export default function FlightSearchForm() {
               ))}
           </select>
           {errors.origin && (
-            <p className="text-error text-xs mt-1">{errors.origin}</p>
+            <p className="text-xs mt-1" style={{ color: 'var(--error)' }}>{errors.origin}</p>
           )}
         </div>
 
         {/* Destination */}
         <div>
-          <label className="block text-xs font-medium text-muted mb-1.5 uppercase tracking-wider">
+          <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wider" style={{ color: 'var(--muted)' }}>
             To
           </label>
           <select
@@ -121,13 +109,13 @@ export default function FlightSearchForm() {
               ))}
           </select>
           {errors.destination && (
-            <p className="text-error text-xs mt-1">{errors.destination}</p>
+            <p className="text-xs mt-1" style={{ color: 'var(--error)' }}>{errors.destination}</p>
           )}
         </div>
 
         {/* Date */}
         <div>
-          <label className="block text-xs font-medium text-muted mb-1.5 uppercase tracking-wider">
+          <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wider" style={{ color: 'var(--muted)' }}>
             Departure Date
           </label>
           <input
@@ -143,13 +131,13 @@ export default function FlightSearchForm() {
             required
           />
           {errors.date && (
-            <p className="text-error text-xs mt-1">{errors.date}</p>
+            <p className="text-xs mt-1" style={{ color: 'var(--error)' }}>{errors.date}</p>
           )}
         </div>
 
         {/* Passengers */}
         <div>
-          <label className="block text-xs font-medium text-muted mb-1.5 uppercase tracking-wider">
+          <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wider" style={{ color: 'var(--muted)' }}>
             Passengers
           </label>
           <select

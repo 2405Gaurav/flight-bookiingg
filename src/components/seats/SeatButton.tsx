@@ -44,27 +44,40 @@ export default function SeatButton({ seat, isSelected, isUserSeat, onSeatClick }
     onSeatClick(seat)
   }, [isUserSeat, onSeatClick, seat])
 
-  let buttonClass =
-    'relative min-h-[40px] min-w-[36px] rounded-t-lg rounded-b-sm text-[10px] font-mono font-semibold transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 '
+  // Determine styles
+  let bg: string, border: string, color: string, cursor: string, transform = 'none', shadow = 'none'
 
   if (isUserSeat) {
-    buttonClass +=
-      'cursor-not-allowed bg-green-500 text-white border-2 border-green-600 opacity-100'
+    bg = '#22c55e'; border = '#16a34a'; color = '#fff'; cursor = 'not-allowed'
   } else if (!seat.is_available) {
-    buttonClass += 'cursor-not-allowed bg-gray-300 opacity-60 border-2 border-gray-400 text-gray-600'
+    bg = 'var(--background-dark)'; border = 'var(--border)'; color = 'var(--muted)'; cursor = 'not-allowed'
   } else if (isSelected) {
-    buttonClass +=
-      'scale-105 cursor-pointer bg-blue-600 text-white ring-2 ring-blue-300 border-2 border-blue-600'
+    bg = 'var(--accent)'; border = 'var(--accent)'; color = '#fff'; cursor = 'pointer'
+    transform = 'scale(1.05)'; shadow = '0 0 12px rgba(232,82,42,0.4)'
   } else {
-    buttonClass +=
-      'cursor-pointer border-2 border-gray-300 bg-white hover:border-blue-400 hover:bg-blue-50 text-gray-900'
+    bg = 'var(--surface)'; border = 'var(--border)'; color = 'var(--secondary)'; cursor = 'pointer'
   }
 
   return (
     <div className="relative flex items-center justify-center">
       <button
         type="button"
-        className={buttonClass}
+        style={{
+          minHeight: '40px',
+          minWidth: '36px',
+          borderRadius: '6px 6px 3px 3px',
+          fontSize: '10px',
+          fontFamily: 'var(--font-mono)',
+          fontWeight: 600,
+          transition: 'transform 150ms, box-shadow 150ms, background 150ms',
+          background: bg,
+          border: `2px solid ${border}`,
+          color,
+          cursor,
+          transform,
+          boxShadow: shadow,
+          opacity: !seat.is_available && !isUserSeat ? 0.5 : 1,
+        }}
         onClick={handleClick}
         onMouseEnter={() => setShowTip(true)}
         onMouseLeave={() => setShowTip(false)}
@@ -79,12 +92,18 @@ export default function SeatButton({ seat, isSelected, isUserSeat, onSeatClick }
         <div
           id={tipId}
           role="tooltip"
-          className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 w-max max-w-[200px] -translate-x-1/2 rounded-lg border border-gray-200 bg-white px-2.5 py-2 text-left text-[10px] text-gray-800 shadow-lg"
+          className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 w-max max-w-[200px] -translate-x-1/2 rounded-lg px-2.5 py-2 text-left text-[10px]"
+          style={{
+            background: 'var(--surface)',
+            border: '1px solid var(--border)',
+            color: 'var(--foreground)',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
+          }}
         >
-          <p className="font-mono font-bold">{seat.seat_number}</p>
-          <p className="text-gray-600">{className}</p>
-          <p className="text-gray-700">Extra fee: {formatExtraFee(seat.extra_fee)}</p>
-          <p className="mt-0.5 font-medium text-gray-900">{statusLabel}</p>
+          <p style={{ fontFamily: 'var(--font-mono)', fontWeight: 700 }}>{seat.seat_number}</p>
+          <p style={{ color: 'var(--muted)' }}>{className}</p>
+          <p style={{ color: 'var(--secondary)' }}>Extra fee: {formatExtraFee(seat.extra_fee)}</p>
+          <p className="mt-0.5 font-medium">{statusLabel}</p>
         </div>
       )}
     </div>

@@ -13,12 +13,6 @@ const CLASS_LABELS: Record<SeatClass, string> = {
   economy: 'Economy',
 }
 
-const CLASS_BADGE: Record<SeatClass, string> = {
-  first: 'bg-amber-100 text-amber-900 border-amber-300',
-  business: 'bg-violet-100 text-violet-900 border-violet-300',
-  economy: 'bg-sky-100 text-sky-900 border-sky-300',
-}
-
 function mergeSeatUpdate(prev: SeatRow, incoming: Partial<SeatRow>): SeatRow {
   return { ...prev, ...incoming }
 }
@@ -116,12 +110,12 @@ export default function SeatMap({
     onSeatConfirmed(selectedSeat)
   }, [onSeatConfirmed, selectedSeat])
 
-  const liveDot =
+  const liveDotColor =
     realtimeStatus === 'connected'
-      ? 'bg-green-500'
+      ? 'var(--success)'
       : realtimeStatus === 'error'
-        ? 'bg-red-500'
-        : 'bg-gray-400'
+        ? 'var(--error)'
+        : 'var(--muted)'
 
   const liveLabel =
     realtimeStatus === 'connected'
@@ -132,23 +126,34 @@ export default function SeatMap({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col" data-selected-class={selectedClass}>
-      <div className="flex shrink-0 items-center justify-between gap-3 border-b border-gray-200 px-4 py-2">
-        <div className="flex items-center gap-2 text-xs text-gray-700">
-          <span className={`h-2 w-2 shrink-0 rounded-full ${liveDot}`} aria-hidden />
+      {/* Status bar */}
+      <div className="flex shrink-0 items-center justify-between gap-3 px-4 py-2" style={{ borderBottom: '1px solid var(--border)' }}>
+        <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--muted)' }}>
+          <span
+            className="h-2 w-2 shrink-0 rounded-full"
+            style={{ background: liveDotColor, animation: realtimeStatus === 'connected' ? 'pulse-dot 2s ease-in-out infinite' : 'none' }}
+            aria-hidden
+          />
           <span className="font-medium">{liveLabel}</span>
         </div>
       </div>
 
+      {/* Seat taken warning */}
       {seatTakenMessage && (
-        <div className="shrink-0 border-b border-red-200 bg-red-50 px-4 py-2 text-center text-xs font-medium text-red-800">
+        <div
+          className="shrink-0 px-4 py-2 text-center text-xs font-medium"
+          style={{ background: 'rgba(239,68,68,0.1)', borderBottom: '1px solid rgba(239,68,68,0.2)', color: 'var(--error)' }}
+        >
           {seatTakenMessage}
         </div>
       )}
 
-      <div className="shrink-0 border-b border-gray-200 px-4 py-3">
+      {/* Legend */}
+      <div className="shrink-0 px-4 py-3" style={{ borderBottom: '1px solid var(--border)' }}>
         <SeatLegend />
       </div>
 
+      {/* Cabin grid */}
       <div className="min-h-0 flex-1 overflow-hidden">
         <CabinGrid
           seats={seats}
@@ -158,25 +163,31 @@ export default function SeatMap({
         />
       </div>
 
-      <div className="shrink-0 border-t border-gray-200 bg-white px-4 py-3 shadow-[0_-4px_12px_rgba(0,0,0,0.06)]">
+      {/* Confirm bar */}
+      <div className="shrink-0 px-4 py-3" style={{ borderTop: '1px solid var(--border)', background: 'var(--background-dark)', boxShadow: '0 -4px 12px rgba(0,0,0,0.2)' }}>
         <div className="mb-3 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
           <div>
             {selectedSeat ? (
               <>
-                <p className="text-sm font-semibold text-gray-900">
-                  Seat <span className="font-mono">{selectedSeat.seat_number}</span>
+                <p className="text-sm font-semibold">
+                  Seat <span style={{ fontFamily: 'var(--font-mono)' }}>{selectedSeat.seat_number}</span>
                   <span
-                    className={`ml-2 inline-block rounded border px-2 py-0.5 text-[10px] font-semibold ${CLASS_BADGE[selectedSeat.class]}`}
+                    className="ml-2 inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold"
+                    style={{
+                      background: selectedSeat.class === 'first' ? 'rgba(245,158,11,0.15)' : selectedSeat.class === 'business' ? 'rgba(139,92,246,0.15)' : 'rgba(14,165,233,0.15)',
+                      color: selectedSeat.class === 'first' ? '#f59e0b' : selectedSeat.class === 'business' ? '#8b5cf6' : '#0ea5e9',
+                      border: `1px solid ${selectedSeat.class === 'first' ? 'rgba(245,158,11,0.3)' : selectedSeat.class === 'business' ? 'rgba(139,92,246,0.3)' : 'rgba(14,165,233,0.3)'}`,
+                    }}
                   >
                     {CLASS_LABELS[selectedSeat.class]}
                   </span>
                 </p>
-                <p className="text-xs text-gray-600">
+                <p className="text-xs" style={{ color: 'var(--muted)' }}>
                   Extra: {selectedSeat.extra_fee > 0 ? formatPrice(selectedSeat.extra_fee) : 'Free'}
                 </p>
               </>
             ) : (
-              <p className="text-sm text-gray-500">Select a seat on the map</p>
+              <p className="text-sm" style={{ color: 'var(--muted)' }}>Select a seat on the map</p>
             )}
           </div>
         </div>
@@ -184,7 +195,7 @@ export default function SeatMap({
           type="button"
           disabled={!selectedSeat}
           onClick={handleConfirm}
-          className="w-full rounded-xl bg-blue-600 py-3 text-sm font-semibold text-white transition enabled:hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500"
+          className="btn-primary w-full py-3 text-sm"
         >
           Confirm Seat
         </button>

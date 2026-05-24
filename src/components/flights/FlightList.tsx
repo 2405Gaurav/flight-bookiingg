@@ -11,10 +11,13 @@ export default function FlightList({ flights }: { flights: FlightWithAvailabilit
   if (!flights || flights.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 animate-fade-in">
-        {/* Empty state illustration */}
-        <div className="w-24 h-24 rounded-full bg-surface flex items-center justify-center mb-6">
+        <div
+          className="w-24 h-24 rounded-full flex items-center justify-center mb-6"
+          style={{ background: 'var(--surface)' }}
+        >
           <svg
-            className="w-12 h-12 text-muted/40"
+            className="w-12 h-12"
+            style={{ color: 'var(--muted)', opacity: 0.4 }}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -27,8 +30,8 @@ export default function FlightList({ flights }: { flights: FlightWithAvailabilit
             />
           </svg>
         </div>
-        <h3 className="text-lg font-semibold text-muted mb-2">No flights found</h3>
-        <p className="text-sm text-muted/70 text-center max-w-sm">
+        <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--muted)', fontFamily: 'var(--font-display)' }}>No flights found</h3>
+        <p className="text-sm text-center max-w-sm" style={{ color: 'var(--muted)', opacity: 0.7 }}>
           We couldn&apos;t find any flights matching your search criteria. Try adjusting your dates
           or route.
         </p>
@@ -38,8 +41,8 @@ export default function FlightList({ flights }: { flights: FlightWithAvailabilit
 
   return (
     <div>
-      <p className="text-sm text-muted mb-4">
-        Found <span className="text-foreground font-medium">{flights.length}</span>{' '}
+      <p className="text-sm mb-4" style={{ color: 'var(--muted)' }}>
+        Found <span className="font-medium" style={{ color: 'var(--foreground)' }}>{flights.length}</span>{' '}
         flight{flights.length !== 1 ? 's' : ''}
       </p>
       <div className="space-y-4">

@@ -1,3 +1,10 @@
+// User fills passenger form → closes browser tab
+// User reopens tab
+//   → name, nationality, DOB are restored 
+//   → passport number is blank (must re-enter)  security feature
+//   → selected flight and seat are restored 
+//   → user resumes exactly where they left off
+
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import type { FlightRow, SeatRow } from '@/types/supabase'
@@ -10,6 +17,7 @@ export interface SearchQuery {
   date: string
   passengerCount: number
 }
+// Exported because FlightSearchForm imports this type to know what shape to pass to setSearchQuery.
 
 export interface PassengerForm {
   fullName: string
@@ -17,18 +25,23 @@ export interface PassengerForm {
   nationality: string
   dob: string
 }
+// This is filled in the booking form. passportNo is the one field that must NOT go to localStorage — that's why partialize zeros it out.
 
 export interface BookingResult {
   bookingId: string
   pnrCode: string
 }
 
-export type BookingStep = 'search' | 'select-seat' | 'passenger-form' | 'confirmation'
+export type BookingStep = 'search' | 'select-seat' | 'passenger-form' | 'confirmation'//Tracks where the user is in the booking journey:
+// search → select-seat → passenger-form → confirmation
+//   ↓           ↓               ↓               ↓
+// /flights  seat modal     /booking/[id]    /booking/confirmation
 
 interface FlightStoreState {
   searchQuery: SearchQuery
   selectedFlight: FlightRow | null
   selectedSeat: SeatRow | null
+  optimisticSeatId: string | null
   currentStep: BookingStep
   passengerForm: PassengerForm
   bookingResult: BookingResult | null
@@ -38,6 +51,8 @@ interface FlightStoreActions {
   setSearchQuery: (query: Partial<SearchQuery>) => void
   setSelectedFlight: (flight: FlightRow | null) => void
   setSelectedSeat: (seat: SeatRow | null) => void
+  setOptimisticSeatId: (id: string | null) => void
+  clearOptimisticSeat: () => void
   setCurrentStep: (step: BookingStep) => void
   setPassengerForm: (form: Partial<PassengerForm>) => void
   setBookingResult: (result: BookingResult | null) => void
@@ -53,6 +68,7 @@ const initialState: FlightStoreState = {
   },
   selectedFlight: null,
   selectedSeat: null,
+  optimisticSeatId: null,
   currentStep: 'search',
   passengerForm: {
     fullName: '',
@@ -65,7 +81,7 @@ const initialState: FlightStoreState = {
 
 export const useFlightStore = create<FlightStoreState & FlightStoreActions>()(
   persist(
-    (set) => ({
+    (set) => ({//set is primary function that is used ti update the state in store
       ...initialState,
 
       setSearchQuery: (query) =>
@@ -77,7 +93,13 @@ export const useFlightStore = create<FlightStoreState & FlightStoreActions>()(
         set({ selectedFlight: flight }),
 
       setSelectedSeat: (seat) =>
-        set({ selectedSeat: seat }),
+        set({ selectedSeat: seat, optimisticSeatId: null }),
+
+      setOptimisticSeatId: (id) =>
+        set({ optimisticSeatId: id }),
+
+      clearOptimisticSeat: () =>
+        set({ optimisticSeatId: null }),
 
       setCurrentStep: (step) =>
         set({ currentStep: step }),

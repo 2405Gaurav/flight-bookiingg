@@ -24,15 +24,12 @@ function buildRowMap(seats: SeatRow[]): Map<number, Map<string, SeatRow>> {
   return map
 }
 
-function ZoneLabel({ label, color }: { label: string; color: 'amber' | 'violet' | 'sky' }) {
-  const colorClass =
-    color === 'amber'
-      ? 'bg-amber-100 text-amber-900 border-amber-300'
-      : color === 'violet'
-        ? 'bg-violet-100 text-violet-900 border-violet-300'
-        : 'bg-sky-100 text-sky-900 border-sky-300'
+function ZoneLabel({ label, color }: { label: string; color: string }) {
   return (
-    <div className={`mb-3 inline-block rounded-lg border px-3 py-1 text-xs font-bold tracking-wide ${colorClass}`}>
+    <div
+      className="mb-3 inline-block rounded-full px-3 py-1 text-xs font-bold tracking-wide"
+      style={{ background: color + '15', color, border: `1px solid ${color}30` }}
+    >
       {label}
     </div>
   )
@@ -41,11 +38,11 @@ function ZoneLabel({ label, color }: { label: string; color: 'amber' | 'violet' 
 function ZoneDivider({ label }: { label: string }) {
   return (
     <div className="my-6 flex items-center gap-3">
-      <div className="h-px flex-1 bg-gray-300" />
-      <span className="shrink-0 text-[11px] font-semibold uppercase tracking-wider text-gray-500">
+      <div className="h-px flex-1" style={{ background: 'var(--border)' }} />
+      <span className="shrink-0 text-[11px] font-semibold uppercase tracking-wider" style={{ color: 'var(--muted)' }}>
         {label}
       </span>
-      <div className="h-px flex-1 bg-gray-300" />
+      <div className="h-px flex-1" style={{ background: 'var(--border)' }} />
     </div>
   )
 }
@@ -53,8 +50,8 @@ function ZoneDivider({ label }: { label: string }) {
 function AircraftNose() {
   return (
     <div className="mb-4 flex justify-center" aria-hidden>
-      <svg viewBox="0 0 120 40" className="h-10 w-32 text-gray-400" fill="currentColor">
-        <path d="M60 4 C20 4 8 20 8 28 L8 36 L112 36 L112 28 C112 20 100 4 60 4 Z" opacity="0.35" />
+      <svg viewBox="0 0 120 40" className="h-10 w-32" style={{ color: 'var(--muted)' }} fill="currentColor">
+        <path d="M60 4 C20 4 8 20 8 28 L8 36 L112 36 L112 28 C112 20 100 4 60 4 Z" opacity="0.2" />
         <path
           d="M60 8 C32 8 16 18 12 30 L108 30 C104 18 88 8 60 8 Z"
           fill="none"
@@ -88,7 +85,7 @@ function SeatRowBlock({
 
   return (
     <div className="flex min-h-[44px] items-center gap-2 sm:gap-3">
-      <span className="w-7 shrink-0 text-right font-mono text-[11px] font-semibold text-gray-600 sm:w-8">
+      <span className="w-7 shrink-0 text-right text-[11px] font-semibold sm:w-8" style={{ fontFamily: 'var(--font-mono)', color: 'var(--muted)' }}>
         {rowNum}
       </span>
       <div className="flex gap-1.5 sm:gap-2">
@@ -155,10 +152,10 @@ export default function CabinGrid({
   const wideLetters = ['A', 'B', 'C', 'D', 'E', 'F'] as const
 
   return (
-    <div className="max-h-[70vh] overflow-y-auto px-4 pb-4">
+    <div className="max-h-[70vh] overflow-y-auto px-4 pb-4" style={{ WebkitOverflowScrolling: 'touch' }}>
       {/* First */}
       <div className="mb-6">
-        <ZoneLabel label="FIRST CLASS" color="amber" />
+        <ZoneLabel label="FIRST CLASS" color="#f59e0b" />
         <AircraftNose />
         <div className="space-y-2">
           {FIRST_ROWS.map((r) => (
@@ -179,7 +176,7 @@ export default function CabinGrid({
 
       <div className="mb-6">
         <div className="mb-3 hidden sm:block">
-          <ZoneLabel label="BUSINESS CLASS" color="violet" />
+          <ZoneLabel label="BUSINESS CLASS" color="#8b5cf6" />
         </div>
         <div className="space-y-2">
           {BUSINESS_ROWS.map((r) => (
@@ -200,7 +197,7 @@ export default function CabinGrid({
 
       <div className="mb-6">
         <div className="mb-3 hidden sm:block">
-          <ZoneLabel label="ECONOMY CLASS" color="sky" />
+          <ZoneLabel label="ECONOMY CLASS" color="#0ea5e9" />
         </div>
         <div className="space-y-2">
           {ECONOMY_ROWS.map((r) => (

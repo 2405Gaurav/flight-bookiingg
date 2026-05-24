@@ -24,6 +24,8 @@ interface UserStoreActions {
   setSession: (session: Session | null) => void
   clearSession: () => void
   setCachedBookings: (bookings: BookingWithDetails[]) => void
+  removeCachedBooking: (bookingId: string) => void
+  updateCachedBookingStatus: (bookingId: string, status: BookingWithDetails['status']) => void
 }
 
 export const useUserStore = create<UserStoreState & UserStoreActions>()(
@@ -40,6 +42,18 @@ export const useUserStore = create<UserStoreState & UserStoreActions>()(
 
       setCachedBookings: (bookings) => set({ cachedBookings: bookings }),
 // Saves bookings to the store after fetching from DB. Used by the My Bookings page so data is readable offline.
+
+      removeCachedBooking: (bookingId) =>
+        set((state) => ({
+          cachedBookings: state.cachedBookings.filter((b) => b.id !== bookingId),
+        })),
+
+      updateCachedBookingStatus: (bookingId, status) =>
+        set((state) => ({
+          cachedBookings: state.cachedBookings.map((b) =>
+            b.id === bookingId ? { ...b, status } : b
+          ),
+        })),
     }),
     {
       name: 'user-store',

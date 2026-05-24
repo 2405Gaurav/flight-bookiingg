@@ -21,12 +21,6 @@ const CLASS_LABELS: Record<string, string> = {
   economy: 'Economy',
 }
 
-const CLASS_COLORS: Record<string, string> = {
-  first: 'border-amber-400 bg-amber-400/10 text-amber-300',
-  business: 'border-violet-400 bg-violet-400/10 text-violet-300',
-  economy: 'border-sky-400 bg-sky-400/10 text-sky-300',
-}
-
 export default function PassengerForm({
   flight,
   initialSeats,
@@ -120,8 +114,8 @@ export default function PassengerForm({
       <div className="space-y-8">
         {/* Passenger Details */}
         <section>
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ fontFamily: 'var(--font-display)' }}>
+            <svg className="w-5 h-5" style={{ color: 'var(--accent)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
             </svg>
             Passenger Details
@@ -130,7 +124,7 @@ export default function PassengerForm({
           <div className="glass-card p-4 sm:p-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-medium text-muted mb-1.5 uppercase tracking-wider">
+                <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wider" style={{ color: 'var(--muted)' }}>
                   Full Name
                 </label>
                 <input
@@ -145,11 +139,11 @@ export default function PassengerForm({
                   placeholder="As on passport"
                 />
                 {errors.fullName && (
-                  <p className="text-error text-xs mt-1">{errors.fullName}</p>
+                  <p className="text-xs mt-1" style={{ color: 'var(--error)' }}>{errors.fullName}</p>
                 )}
               </div>
               <div>
-                <label className="block text-xs font-medium text-muted mb-1.5 uppercase tracking-wider">
+                <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wider" style={{ color: 'var(--muted)' }}>
                   Passport Number
                 </label>
                 <input
@@ -164,11 +158,11 @@ export default function PassengerForm({
                   placeholder="e.g. A1234567"
                 />
                 {errors.passportNo && (
-                  <p className="text-error text-xs mt-1">{errors.passportNo}</p>
+                  <p className="text-xs mt-1" style={{ color: 'var(--error)' }}>{errors.passportNo}</p>
                 )}
               </div>
               <div>
-                <label className="block text-xs font-medium text-muted mb-1.5 uppercase tracking-wider">
+                <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wider" style={{ color: 'var(--muted)' }}>
                   Nationality
                 </label>
                 <input
@@ -183,11 +177,11 @@ export default function PassengerForm({
                   placeholder="e.g. Indian"
                 />
                 {errors.nationality && (
-                  <p className="text-error text-xs mt-1">{errors.nationality}</p>
+                  <p className="text-xs mt-1" style={{ color: 'var(--error)' }}>{errors.nationality}</p>
                 )}
               </div>
               <div>
-                <label className="block text-xs font-medium text-muted mb-1.5 uppercase tracking-wider">
+                <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wider" style={{ color: 'var(--muted)' }}>
                   Date of Birth
                 </label>
                 <input
@@ -201,7 +195,7 @@ export default function PassengerForm({
                   className={`form-input ${errors.dob ? 'border-error' : ''}`}
                 />
                 {errors.dob && (
-                  <p className="text-error text-xs mt-1">{errors.dob}</p>
+                  <p className="text-xs mt-1" style={{ color: 'var(--error)' }}>{errors.dob}</p>
                 )}
               </div>
             </div>
@@ -210,8 +204,8 @@ export default function PassengerForm({
 
         {/* Seat Selection */}
         <section>
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ fontFamily: 'var(--font-display)' }}>
+            <svg className="w-5 h-5" style={{ color: 'var(--accent)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25a2.25 2.25 0 0 1-2.25-2.25v-2.25Z" />
             </svg>
             Seat Selection
@@ -221,19 +215,29 @@ export default function PassengerForm({
             {selectedSeat ? (
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <span className="font-mono font-bold text-primary text-lg">
+                  <div
+                    className="w-12 h-12 rounded-xl flex items-center justify-center"
+                    style={{ background: 'rgba(232,82,42,0.12)' }}
+                  >
+                    <span className="font-bold text-lg" style={{ fontFamily: 'var(--font-mono)', color: 'var(--accent)' }}>
                       {selectedSeat.seat_number}
                     </span>
                   </div>
                   <div>
                     <p className="font-medium">Seat {selectedSeat.seat_number}</p>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <span className={`text-[10px] px-2 py-0.5 rounded border ${CLASS_COLORS[selectedSeat.class]}`}>
+                      <span
+                        className="text-[10px] px-2 py-0.5 rounded-full"
+                        style={{
+                          background: selectedSeat.class === 'first' ? 'rgba(245,158,11,0.15)' : selectedSeat.class === 'business' ? 'rgba(139,92,246,0.15)' : 'rgba(14,165,233,0.15)',
+                          color: selectedSeat.class === 'first' ? '#f59e0b' : selectedSeat.class === 'business' ? '#8b5cf6' : '#0ea5e9',
+                          border: `1px solid ${selectedSeat.class === 'first' ? 'rgba(245,158,11,0.3)' : selectedSeat.class === 'business' ? 'rgba(139,92,246,0.3)' : 'rgba(14,165,233,0.3)'}`,
+                        }}
+                      >
                         {CLASS_LABELS[selectedSeat.class]}
                       </span>
                       {selectedSeat.extra_fee > 0 && (
-                        <span className="text-xs text-warning">
+                        <span className="text-xs" style={{ color: 'var(--warning)' }}>
                           +{formatPrice(selectedSeat.extra_fee)}
                         </span>
                       )}
@@ -249,7 +253,7 @@ export default function PassengerForm({
               </div>
             ) : (
               <div className="text-center py-6">
-                <p className="text-muted text-sm mb-4">No seat selected yet</p>
+                <p className="text-sm mb-4" style={{ color: 'var(--muted)' }}>No seat selected yet</p>
                 <button
                   onClick={handleOpenSeatModal}
                   className="btn-primary text-sm py-2.5 px-6"
@@ -264,28 +268,28 @@ export default function PassengerForm({
         {/* Price Summary */}
         <section className="glass-card p-4 sm:p-6">
           <div className="flex items-center justify-between mb-4">
-            <span className="text-muted text-sm">Base fare</span>
+            <span className="text-sm" style={{ color: 'var(--muted)' }}>Base fare</span>
             <span className="font-medium">{formatPrice(flight.base_price)}</span>
           </div>
           {selectedSeat && selectedSeat.extra_fee > 0 && (
             <div className="flex items-center justify-between mb-4">
-              <span className="text-muted text-sm">
+              <span className="text-sm" style={{ color: 'var(--muted)' }}>
                 Seat upgrade ({CLASS_LABELS[selectedSeat.class]})
               </span>
-              <span className="font-medium text-warning">
+              <span className="font-medium" style={{ color: 'var(--warning)' }}>
                 +{formatPrice(selectedSeat.extra_fee)}
               </span>
             </div>
           )}
-          <div className="border-t border-border pt-4 flex items-center justify-between">
+          <div className="pt-4 flex items-center justify-between" style={{ borderTop: '1px solid var(--border)' }}>
             <span className="font-semibold">Total</span>
-            <span className="text-2xl font-bold text-primary">{formatPrice(totalPrice)}</span>
+            <span className="text-2xl font-bold" style={{ color: 'var(--accent)', fontFamily: 'var(--font-display)' }}>{formatPrice(totalPrice)}</span>
           </div>
         </section>
 
         {/* Error message */}
         {submitError && (
-          <div className="bg-error/10 border border-error/30 text-error rounded-xl px-4 py-3 text-sm animate-fade-in">
+          <div className="rounded-xl px-4 py-3 text-sm animate-fade-in" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: 'var(--error)' }}>
             {submitError}
           </div>
         )}
