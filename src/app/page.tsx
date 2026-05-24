@@ -12,22 +12,74 @@ export default async function HomePage() {
   return (
     <div className="bg-grid-dark min-h-[calc(100vh-4rem)] flex flex-col">
       {/* Hero */}
-      <section className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-16 text-center relative">
+      <section className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-16 text-center relative overflow-hidden">
+
         {/* Decorative radial glow */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full" style={{ background: 'radial-gradient(ellipse, rgba(232,82,42,0.06) 0%, transparent 70%)' }} />
+          <div
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full"
+            style={{ background: 'radial-gradient(ellipse, rgba(232,82,42,0.07) 0%, transparent 70%)' }}
+          />
         </div>
 
+        {/* Plane SVG background — top-down silhouette, tilted, right-side */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+          <svg
+            viewBox="0 0 520 520"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="absolute"
+            style={{
+              width: 'clamp(340px, 48vw, 580px)',
+              right: '-6%',
+              top: '50%',
+              transform: 'translateY(-52%) rotate(-22deg)',
+              opacity: 0.045,
+            }}
+          >
+            {/* Fuselage */}
+            <ellipse cx="260" cy="260" rx="22" ry="200" fill="white" />
+
+            {/* Nose cone */}
+            <ellipse cx="260" cy="68" rx="13" ry="30" fill="white" />
+
+            {/* Main wings — swept back */}
+            <path d="M 248 210 L 20 330 L 20 348 L 248 242 Z" fill="white" />
+            <path d="M 272 210 L 500 330 L 500 348 L 272 242 Z" fill="white" />
+
+            {/* Wing root fairings */}
+            <ellipse cx="248" cy="226" rx="14" ry="30" fill="white" />
+            <ellipse cx="272" cy="226" rx="14" ry="30" fill="white" />
+
+            {/* Engine nacelles — left */}
+            <rect x="82" y="308" width="60" height="18" rx="9" fill="white" />
+            {/* Engine nacelles — right */}
+            <rect x="378" y="308" width="60" height="18" rx="9" fill="white" />
+
+            {/* Horizontal stabilizers */}
+            <path d="M 248 418 L 148 464 L 148 476 L 248 436 Z" fill="white" />
+            <path d="M 272 418 L 372 464 L 372 476 L 272 436 Z" fill="white" />
+
+            {/* Vertical stabilizer (fin) */}
+            <path d="M 252 380 L 220 418 L 300 418 L 268 380 Z" fill="white" />
+          </svg>
+        </div>
+
+        {/* Content */}
         <div className="relative z-10 max-w-3xl mx-auto mb-10 animate-slide-up">
           <div className="section-label mb-6" style={{ fontFamily: 'var(--font-mono)' }}>
             ✈ Domestic Flights Across India
           </div>
+
+          {/* Redesigned heading — balanced two-liner */}
           <h1
-            className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.1] mb-4"
+            className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.12] mb-4"
             style={{ fontFamily: 'var(--font-display)', letterSpacing: '-0.03em' }}
           >
-            Explore the <span className="gradient-text">Skies</span>
+            Your Journey,{' '}
+            <span className="gradient-text">Your Sky.</span>
           </h1>
+
           <p className="text-lg max-w-xl mx-auto" style={{ color: 'var(--muted)', lineHeight: 1.65 }}>
             Search, compare, and book the best flight deals.
             Your journey starts here.

@@ -1,36 +1,93 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SourceAsia — Flight Management Web App (PWA)
 
-## Getting Started
+A production-ready Flight Management application built with Next.js 14, Supabase, and Zustand. This app allows passengers to search flights, select seats in real-time, manage bookings, and works offline as a Progressive Web App (PWA).
 
-First, run the development server:
+## 🚀 Live Demo
+[Production URL](https://flight-management-phi.vercel.app/)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🛠 Tech Stack
+- **Frontend**: Next.js 14 (App Router, Server Components)
+- **Database & Auth**: Supabase (PostgreSQL, RLS, Realtime, RPC)
+- **State Management**: Zustand + Persist Middleware
+- **Styling**: Tailwind CSS + Syne & Inter Fonts
+- **PWA**: Serwist (Modern next-pwa successor)
+- **Deployment**: Vercel
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📦 Features
+- **Task 01: Search & Booking**: Multi-step booking flow from search to PNR confirmation.
+- **Task 02: Real-time Seat Map**: Visual aircraft grid with live updates via Supabase Realtime.
+- **Task 03: Manage Bookings**: Reschedule or cancel flights with DB-enforced business rules (e.g., the 2-hour cancellation rule).
+- **Task 04: Persistent Store**: Zustand store with partial persistence (sensitive data like passport numbers are never saved to localStorage).
+- **Task 05: PWA**: Installable on mobile/desktop, offline-capable with custom fallback and cached booking data.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🗄 Database Schema
+The project includes a robust Supabase schema located in `/supabase/migrations`:
+1. `flights`: Core flight information and pricing.
+2. `seats`: Individual seat availability and class-based fees.
+3. `bookings`: Linking users to flights and seats with unique PNR codes.
+4. `passengers`: Securely stored passenger details.
+5. `reschedules`: Audit log of flight changes.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Key DB Logic:
+- **Atomic Booking**: The `lock_and_book_seat` RPC uses `FOR UPDATE SKIP LOCKED` to prevent race conditions during seat selection.
+- **2-Hour Rule**: A database trigger `trg_cancellation_window` blocks any cancellation within 2 hours of departure, ensuring data integrity even if the UI is bypassed.
+- **RLS**: Row Level Security is enabled on all tables. Users can only see and manage their own bookings.
 
-## Learn More
+## 🧠 Zustand Store Structure
+The app uses two specialized stores:
 
-To learn more about Next.js, take a look at the following resources:
+### `useFlightStore`
+Manages the booking journey state.
+- **Persisted**: `searchQuery`, `selectedFlight`, `selectedSeat`, `currentStep`.
+- **Partialized**: The `passengerForm` is persisted, but the `passportNo` field is explicitly excluded for security.
+- **Actions**: Handles step navigation and store resets.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### `useUserStore`
+Manages authentication and offline caching.
+- **Persisted**: Only essential session tokens (access/refresh tokens).
+- **Offline Cache**: Stores a local copy of the user's bookings to enable viewing "My Bookings" while offline.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🛠 Local Setup
 
-## Deploy on Vercel
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/your-username/flight-management.git
+   cd flight-management
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+3. **Environment Variables**:
+   Copy `.env.example` to `.env.local` and fill in your Supabase credentials.
+   ```bash
+   cp .env.example .env.local
+   ```
+
+4. **Supabase Migrations**:
+   Run the SQL files in `/supabase/migrations` in order (001 to 004) in your Supabase SQL Editor, or use the Supabase CLI:
+   ```bash
+   supabase db push
+   ```
+
+5. **Run the app**:
+   ```bash
+   npm run dev
+   ```
+
+## 🧪 Test Credentials
+Use the following credentials to test the application:
+- **Email**: `test@flightapp.dev`
+- **Password**: `Test1234!`
+
+## 📱 PWA & Lighthouse
+The app is fully PWA compliant.
+- **Installable**: Custom install prompt for mobile users.
+- **Offline**: Custom `/offline` page and stale-while-revalidate caching for flight data.
+- **Lighthouse**: Scores ≥ 90 in PWA audits.
+
+![Lighthouse Score](./public/lighthouse/pwa.png)
+
+---
