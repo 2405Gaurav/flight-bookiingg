@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useSyncExternalStore } from 'react'
 import { useRouter } from 'next/navigation'
 import type { BookingWithDetails } from '@/types/supabase'
 import { cancelBookingAction } from '@/app/my-bookings/actions'
@@ -37,16 +37,40 @@ function isWithin2Hours(departsAt: string): boolean {
   return departTime - now < 2 * 60 * 60 * 1000
 }
 
+// ── Offline detection hook ──
+function subscribeOnline(cb: () => void) {
+  window.addEventListener('online', cb)
+  window.addEventListener('offline', cb)
+  return () => {
+    window.removeEventListener('online', cb)
+    window.removeEventListener('offline', cb)
+  }
+}
+function getOnlineSnapshot() { return navigator.onLine }
+function getServerSnapshot() { return true }
+
+function useIsOnline(): boolean {
+  return useSyncExternalStore(subscribeOnline, getOnlineSnapshot, getServerSnapshot)
+}
+
 type Props = {
   initialBookings: BookingWithDetails[]
 }
 
 export default function MyBookingsClient({ initialBookings }: Props) {
   const router = useRouter()
+  const isOnline = useIsOnline()
   const resetStore = useFlightStore((s) => s.resetStore)
   const setCachedBookings = useUserStore((s) => s.setCachedBookings)
 
   const [bookings, setBookings] = useState<BookingWithDetails[]>(initialBookings)
+
+  // Cache bookings in Zustand for offline access
+  useEffect(() => {
+    if (initialBookings.length > 0) {
+      setCachedBookings(initialBookings)
+    }
+  }, [initialBookings, setCachedBookings])
 
   // Cancel state
   const [cancelTarget, setCancelTarget] = useState<BookingWithDetails | null>(null)
@@ -56,11 +80,6 @@ export default function MyBookingsClient({ initialBookings }: Props) {
   // Reschedule state
   const [rescheduleTarget, setRescheduleTarget] = useState<BookingWithDetails | null>(null)
   const [rescheduleSuccess, setRescheduleSuccess] = useState('')
-
-  // Cache bookings in Zustand
-  useState(() => {
-    setCachedBookings(initialBookings)
-  })
 
   const handleCancelConfirm = useCallback(async () => {
     if (!cancelTarget) return
@@ -132,6 +151,19 @@ export default function MyBookingsClient({ initialBookings }: Props) {
 
   return (
     <>
+      {/* Offline banner */}
+      {!isOnline && (
+        <div
+          className="mb-6 rounded-xl px-4 py-3 text-sm animate-fade-in flex items-center gap-2"
+          style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', color: 'var(--warning)' }}
+        >
+          <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8.288 15.038a5.25 5.25 0 0 1 7.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 0 1 1.06 0Z" />
+          </svg>
+          <span>You&apos;re offline — viewing cached bookings. Cancel and reschedule are unavailable.</span>
+        </div>
+      )}
+
       {/* Success toast */}
       {rescheduleSuccess && (
         <div
@@ -260,7 +292,7 @@ export default function MyBookingsClient({ initialBookings }: Props) {
                   <button
                     onClick={() => setRescheduleTarget(booking)}
                     className="btn-secondary text-xs py-2 px-4 flex items-center gap-1.5"
-                    disabled={!canReschedule}
+                    disabled={!canReschedule || !isOnline}
                   >
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
@@ -270,7 +302,7 @@ export default function MyBookingsClient({ initialBookings }: Props) {
                   <button
                     onClick={() => { setCancelError(''); setCancelTarget(booking) }}
                     className="text-xs py-2 px-4 rounded-full flex items-center gap-1.5 transition-all duration-150"
-                    disabled={!canCancel}
+                    disabled={!canCancel || !isOnline}
                     style={{
                       background: 'transparent',
                       border: '1.5px solid rgba(239,68,68,0.3)',
